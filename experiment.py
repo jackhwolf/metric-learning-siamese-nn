@@ -1,4 +1,3 @@
-import json
 import os
 import numpy as np
 from data import Data
@@ -7,28 +6,14 @@ from time import time
 
 class ExperimentBase:
 
-    def __init__(self, P, D, N, resultspath):
+    def __init__(self, P, D, N, eid, resultspath):
         self.data = Data(P, D, N)
         self.model = Model(P, D)
+        self.eid = eid
         self.resultspath = os.path.join('results', resultspath) + '.json'
-        self.results = None
 
     def run(self):
         pass
-
-    def save(self):
-        if self.results is None:
-            return
-        self.results['description'] = self.describe()
-        curr = []
-        if os.path.exists(self.resultspath):
-            with open(self.resultspath, 'r') as fp:
-                curr = json.loads(fp.read())
-        else:
-            open(self.resultspath, 'a').close()
-        curr.append(self.results)
-        with open(self.resultspath, 'w') as fp:
-            fp.write(json.dumps(curr))
 
     def describe(self):
         out = self.model.describe()
@@ -37,11 +22,23 @@ class ExperimentBase:
         out['N'] = self.data.N
         return out
 
+class ExperimentPool:
+
+    def __init__(self, n, obj, *args, **kw):
+        self.n = n
+        self.obj = obj
+        self.args = args
+        self.kw = kw
+        self.pool = [obj(*self.args, eid=i, **self.kw) for i in range(n)]
+
+    def __getitem__(self, i):
+        return self.pool[i]
+
 class InterpolationExperiment(ExperimentBase):
 
-    def __init__(self, P, D, N, resultspath='interpolation', \
+    def __init__(self, P, D, N, eid=1, resultspath='interpolation', \
                             loss_threshold=1e-4, s=0.05, u=.2, r=5):
-        super().__init__(P, D, N, resultspath)
+        super().__init__(P, D, N, eid, resultspath)
         self.loss_threshold = loss_threshold
         self.s = s
         self.u = u
@@ -56,7 +53,7 @@ class InterpolationExperiment(ExperimentBase):
         record = []
         for r in range(self.mr):
             self.has_interpolated, losses = self.interpolating_on_sample()
-            record.append([self.current_epochs, np.max(losses)])
+            record.append({'epochs': self.current_epochs, 'max_loss': np.max(losses)})
             if self.has_interpolated:
                 break
             self.current_epochs = int(self.current_epochs * (1+self.u))
@@ -66,7 +63,9 @@ class InterpolationExperiment(ExperimentBase):
         out['rounds'] = r
         out['record'] = record
         out['final_epochs'] = self.current_epochs
-        self.results = out
+        out['threshold'] = self.loss_threshold
+        out['parameters'] = self.describe()
+        return out
 
     def interpolating_on_sample(self):
         losses = []
@@ -74,11 +73,10 @@ class InterpolationExperiment(ExperimentBase):
         for i, triplet in enumerate(self.triplets):
             loss = self.model.learn_triplet(*triplet, epochs=self.current_epochs)
             if i % 10:
-                print(f"round={self.cr}/{self.mr}, triplet={i}/{l}: {loss}")
+                print(f"eid={self.eid}, round={self.cr}/{self.mr}, triplet={i}/{l}: loss={loss}")
             losses.append(loss)
         losses = np.array(losses)
-        thresh = np.full_like(losses, self.loss_threshold)
-        if np.all(losses <= thresh):
+        if np.all(losses <= self.loss_threshold):
             return True, losses
         return False, losses
 
@@ -87,13 +85,15 @@ class InterpolationExperiment(ExperimentBase):
         for pi, pj, label in self.data.iterate_triplets():
             if np.random.uniform(low=0, high=1) < self.s:
                 triplets.append([pi, pj, label['noisy']])
+        if len(triplets) == 0:
+            triplets.append([pi, pj, label['noisy']])
         self.triplets = triplets
     
 class ExcessRiskExperiment(ExperimentBase):
 
-    def __init__(self, P, D, N, resultspath='excess_risk', cer_threshold=0.1):
-        super().__init__(P, D, N, resultspath)
-        self.cer_threshold = 0.1
+    def __init__(self, P, D, N, eid=1, resultspath='excess_risk', cer_threshold=1):
+        super().__init__(P, D, N, eid, resultspath)
+        self.cer_threshold = cer_threshold
         self.observed = 0
         self.curr_excess_risk = None
 
@@ -105,11 +105,14 @@ class ExcessRiskExperiment(ExperimentBase):
                 loss = self.model.learn_triplet(pi, pj, label['noisy'])
                 self.curr_excess_risk = self.relative_excess_risk()
                 self.observed += 1
-                # print(f"observed: {self.oberved}, c.e.r: {self.curr_excess_risk}")
-                if curr < self.cer_threshold:
+                print(f"observed: {self.observed}, c.e.r: {self.curr_excess_risk}")
+                if self.curr_excess_risk < self.cer_threshold:
                     stop = True
                     break
-        self.results = {'timestamp': str(time()), 'oberved': observed, 'parameters': {'p1': 'v1'}}
+        out = {'timestamp': str(time())}
+        out['observed'] = self.observed
+        out['parameters'] = self.describe()
+        return out
 
     ''' compute relative excess risk (R(*) - R(^)) / R(^) '''
     def relative_excess_risk(self):
@@ -131,12 +134,3 @@ class ExcessRiskExperiment(ExperimentBase):
         mu, t, f = info['mu'], info['true'], -1 * info['true']
         return (mu * t) + ((1-mu) * f)
 
-if __name__ == '__main__':
-    P = 100
-    D = 1
-    N = 10
-
-    exp = InterpolationExperiment(P, D, N)
-    exp.run()
-    # print(exp.results)
-    exp.save()
