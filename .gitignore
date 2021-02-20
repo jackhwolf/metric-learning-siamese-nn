@@ -4,3 +4,4 @@ venv
 Untitled.ipynb
 .vscode
 dask-worker-space
+results/*.json

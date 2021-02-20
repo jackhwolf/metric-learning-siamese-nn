@@ -6,9 +6,9 @@ from time import time
 
 class ExperimentBase:
 
-    def __init__(self, P, D, N, eid, resultspath):
+    def __init__(self, P, D, N, eid, resultspath, modelargs={}):
         self.data = Data(P, D, N)
-        self.model = Model(P, D)
+        self.model = Model(P, D, **modelargs)
         self.eid = eid
         self.resultspath = os.path.join('results', resultspath) + '.json'
 
@@ -16,20 +16,19 @@ class ExperimentBase:
         pass
 
     def describe(self):
-        out = self.model.describe()
-        out['P'] = self.data.P
-        out['D'] = self.data.D
-        out['N'] = self.data.N
+        out = {}
+        out.update(self.model.describe())
+        out.update(self.data.describe())
         return out
 
 class ExperimentPool:
 
     def __init__(self, n, obj, *args, **kw):
-        self.n = n
+        self.n = int(n)
         self.obj = obj
         self.args = args
         self.kw = kw
-        self.pool = [obj(*self.args, eid=i, **self.kw) for i in range(n)]
+        self.pool = [obj(*self.args, eid=i, **self.kw) for i in range(self.n)]
 
     def __getitem__(self, i):
         return self.pool[i]
@@ -37,12 +36,12 @@ class ExperimentPool:
 class InterpolationExperiment(ExperimentBase):
 
     def __init__(self, P, D, N, eid=1, resultspath='interpolation', \
-                            loss_threshold=1e-4, s=0.05, u=.2, r=5):
-        super().__init__(P, D, N, eid, resultspath)
-        self.loss_threshold = loss_threshold
-        self.s = s
-        self.u = u
-        self.mr = r
+                    loss_threshold=1e-4, s=0.05, u=.2, r=3, modelargs={}):
+        super().__init__(P, D, N, eid, resultspath, modelargs)
+        self.loss_threshold = float(loss_threshold)
+        self.s = float(s)
+        self.u = float(u)
+        self.mr = int(r)
         self.cr = 0
         self.triplets = []
         self.current_epochs = self.model.epochs
@@ -76,7 +75,7 @@ class InterpolationExperiment(ExperimentBase):
                 print(f"eid={self.eid}, round={self.cr}/{self.mr}, triplet={i}/{l}: loss={loss}")
             losses.append(loss)
         losses = np.array(losses)
-        if np.all(losses <= self.loss_threshold):
+        if np.mean(losses) <= self.loss_threshold:
             return True, losses
         return False, losses
 
@@ -91,8 +90,9 @@ class InterpolationExperiment(ExperimentBase):
     
 class ExcessRiskExperiment(ExperimentBase):
 
-    def __init__(self, P, D, N, eid=1, resultspath='excess_risk', cer_threshold=1):
-        super().__init__(P, D, N, eid, resultspath)
+    def __init__(self, P, D, N, eid=1, resultspath='excess_risk', \
+                    cer_threshold=0.1, modelargs={}):
+        super().__init__(P, D, N, eid, resultspath, modelargs)
         self.cer_threshold = cer_threshold
         self.observed = 0
         self.curr_excess_risk = None

@@ -10,15 +10,13 @@ class Data:
     N: # points
     '''
     def __init__(self, P, D, N):
-        self.P = P
-        self.D = D
-        self.N = N
-        self.points = np.random.normal(0, 1/P, (N+1,P))
-        xsi = np.random.choice(np.arange(N))
+        self.P, self.D, self.N  = int(P), int(D), int(N)
+        self.points = np.random.normal(0, 1/self.P, (self.N+1,self.P))
+        xsi = np.random.choice(np.arange(self.N))
         self.x_star = self.points[xsi,:]
         self.points = np.delete(self.points, xsi, 0)
         # remove x_star from points
-        self.l_star = self.random_l_star() * (P / np.sqrt(D))
+        self.l_star = self.random_l_star() * (self.P / np.sqrt(self.D))
         self.embedded_metric = np.matmul(self.x_star, self.l_star)
 
     ''' yield triplets (point_i, point_j, noisy_y_ij) '''
@@ -55,3 +53,10 @@ class Data:
         u, s, vh = np.linalg.svd(H, full_matrices=False)
         mat = u @ vh  # mat.T @ mat = identity
         return mat
+
+    def describe(self):
+        out = {}
+        out['P'] = self.P
+        out['D'] = self.D
+        out['N'] = self.N
+        return out

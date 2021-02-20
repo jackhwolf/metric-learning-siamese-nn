@@ -15,14 +15,15 @@ class hingeloss(torch.nn.Module):
 
 class Model:
 
-    def __init__(self, P, D, lr=1e-4, wd=1e-5, epochs=5):
-        self.P = P
-        self.D = D
-        self.lr, self.wd, self.epochs = (lr, wd, epochs)
+    def __init__(self, P, D, lr=1e-3, wd=1e-5, epochs=100):
+        self.P = int(P)
+        self.D = int(D)
+        self.lr, self.wd, self.epochs = (float(lr), float(wd), int(epochs))
         self.criterion = hingeloss()
-        self.x_hat = self.to_var((torch.rand((1, P))*2) - 1)
-        self.l_hat = self.to_var((torch.rand((P, D))*2) - 1)
-        self.optimizer = torch.optim.SGD([self.x_hat, self.l_hat], lr=lr, weight_decay=wd)
+        self.x_hat = self.to_var((torch.rand((1, self.P))*2) - 1)
+        self.l_hat = self.to_var((torch.rand((self.P, self.D))*2) - 1)
+        params = [self.x_hat, self.l_hat]
+        self.optimizer = torch.optim.SGD(params, lr=self.lr, weight_decay=self.wd)
         self.const_inp_x = torch.FloatTensor([1])
         self.const_inp_l = torch.FloatTensor(np.identity(self.P))
 

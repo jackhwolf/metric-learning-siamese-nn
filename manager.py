@@ -4,15 +4,16 @@ import asyncio
 from dask.distributed import Scheduler, Worker, Client
 from contextlib import AsyncExitStack
 import libtmux
+import pyyaml
 from experiment import ExperimentPool, InterpolationExperiment, ExcessRiskExperiment
 
 class Manager:
 
     def __init__(self, workers=2, session_name='metric-learning'):
         self.workers = workers
-        self.session = libtmux.Server().new_session(session_name)
-        self.session.attach_session()
-        self.pool = ExperimentPool(5, ExcessRiskExperiment, 20, 3, 10)
+        # self.session = libtmux.Server().new_session(session_name, kill_session=True)
+        # self.session.attach_session()
+        self.pool = ExperimentPool('5', InterpolationExperiment, '20', '3', '100', modelargs={'epochs': '1'})
         self.results = []
 
     async def distributed_run(self):
