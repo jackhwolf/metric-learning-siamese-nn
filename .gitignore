@@ -3,3 +3,4 @@ __pycache__
 venv
 Untitled.ipynb
 .vscode
+dask-worker-space
