@@ -3,7 +3,6 @@ import os
 import asyncio
 from dask.distributed import Scheduler, Worker, Client
 from contextlib import AsyncExitStack
-import libtmux
 import yaml
 from experiment import ExperimentPool, InterpolationExperiment, ExcessRiskExperiment
 
@@ -51,10 +50,7 @@ class Manager:
 if __name__ == '__main__':
     import sys
 
-    c = ManagerInput(sys.argv[1]).content
-    print(c)
-
-    # m = Manager(sys.argv[1], int(sys.argv[2]))
-    # f = m.distributed_run
-    # out = asyncio.get_event_loop().run_until_complete(f())
-    # print(out)
+    m = Manager(sys.argv[1], int(sys.argv[2]))
+    f = m.distributed_run
+    out = asyncio.get_event_loop().run_until_complete(f())
+    print(out)

@@ -15,7 +15,6 @@ class Data:
         xsi = np.random.choice(np.arange(self.N))
         self.x_star = self.points[xsi,:]
         self.points = np.delete(self.points, xsi, 0)
-        # remove x_star from points
         self.l_star = self.random_l_star() * (self.P / np.sqrt(self.D))
         self.embedded_metric = np.matmul(self.x_star, self.l_star)
 

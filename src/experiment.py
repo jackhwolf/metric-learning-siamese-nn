@@ -1,8 +1,8 @@
 import os
 import numpy as np
+from time import time
 from data import Data
 from model import Model
-from time import time
 
 class ExperimentBase:
 

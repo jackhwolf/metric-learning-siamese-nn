@@ -4,7 +4,8 @@ experiment_args:
   P: 20
   D: 3
   N: 100
-  s: 0.2
+  s: 0.05
 model_args:
   epochs: 1
-  wd: 1e-2
+  lr: 1e-2
+  wd: 1e-5
