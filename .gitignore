@@ -5,3 +5,6 @@ Untitled.ipynb
 .vscode
 dask-worker-space
 results/*.json
+Files/yaml
+!Files/yaml/interpolation_sample.yaml
+!Files/yaml/excess_risk_sample.yaml
