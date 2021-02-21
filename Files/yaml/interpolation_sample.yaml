@@ -1,0 +1,10 @@
+poolsize: 3
+experiment: InterpolationExperiment
+experiment_args:
+  P: 20
+  D: 3
+  N: 100
+  s: 0.2
+model_args:
+  epochs: 1
+  wd: 1e-2
