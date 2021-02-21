@@ -16,8 +16,7 @@ class ManagerInput:
             self.content['experiment'] = InterpolationExperiment
         else:
             self.content['experiment'] = ExcessRiskExperiment
-
-
+        
 class Manager:
 
     def __init__(self, fname, workers):
@@ -51,7 +50,11 @@ class Manager:
 
 if __name__ == '__main__':
     import sys
-    m = Manager(sys.argv[1], int(sys.argv[2]))
-    f = m.distributed_run
-    out = asyncio.get_event_loop().run_until_complete(f())
-    print(out)
+
+    c = ManagerInput(sys.argv[1]).content
+    print(c)
+
+    # m = Manager(sys.argv[1], int(sys.argv[2]))
+    # f = m.distributed_run
+    # out = asyncio.get_event_loop().run_until_complete(f())
+    # print(out)

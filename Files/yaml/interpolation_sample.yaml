@@ -1,4 +1,4 @@
-poolsize: 3
+poolsize: 1
 experiment: InterpolationExperiment
 experiment_args:
   P: 20
