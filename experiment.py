@@ -10,7 +10,7 @@ class ExperimentBase:
         self.data = Data(P, D, N)
         self.model = Model(P, D, **modelargs)
         self.eid = eid
-        self.resultspath = os.path.join('results', resultspath) + '.json'
+        self.resultspath = os.path.join('Files', 'results', resultspath) + '.json'
 
     def run(self):
         pass
@@ -23,21 +23,23 @@ class ExperimentBase:
 
 class ExperimentPool:
 
-    def __init__(self, n, obj, *args, **kw):
-        self.n = int(n)
-        self.obj = obj
-        self.args = args
-        self.kw = kw
-        self.pool = [obj(*self.args, eid=i, **self.kw) for i in range(self.n)]
+    def __init__(self, poolsize, experiment, experiment_args, model_args):
+        self.poolsize = int(poolsize)
+        self.experiment = experiment
+        self.eargs = experiment_args
+        self.margs = model_args
+        self.pool = [experiment(eid=i, modelargs=self.margs, **self.eargs) for i in range(self.poolsize)]
 
     def __getitem__(self, i):
         return self.pool[i]
 
+    def __len__(self):
+        return self.poolsize
+
 class InterpolationExperiment(ExperimentBase):
 
-    def __init__(self, P, D, N, eid=1, resultspath='interpolation', \
-                    loss_threshold=1e-4, s=0.05, u=.2, r=3, modelargs={}):
-        super().__init__(P, D, N, eid, resultspath, modelargs)
+    def __init__(self, P=10, D=3, N=5, eid=1, loss_threshold=1e-4, s=0.05, u=.2, r=3, modelargs={}):
+        super().__init__(P, D, N, eid, 'interpolation', modelargs)
         self.loss_threshold = float(loss_threshold)
         self.s = float(s)
         self.u = float(u)
@@ -88,11 +90,17 @@ class InterpolationExperiment(ExperimentBase):
             triplets.append([pi, pj, label['noisy']])
         self.triplets = triplets
     
+    def describe(self):
+        out = super().describe()
+        out['s'] = self.s
+        out['u'] = self.u
+        out['r'] = self.mr
+        return out
+
 class ExcessRiskExperiment(ExperimentBase):
 
-    def __init__(self, P, D, N, eid=1, resultspath='excess_risk', \
-                    cer_threshold=0.1, modelargs={}):
-        super().__init__(P, D, N, eid, resultspath, modelargs)
+    def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, modelargs={}):
+        super().__init__(P, D, N, eid, 'excess_risk', modelargs)
         self.cer_threshold = cer_threshold
         self.observed = 0
         self.curr_excess_risk = None
