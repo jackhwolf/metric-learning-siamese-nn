@@ -23,17 +23,21 @@ class Manager:
         self.pool = ExperimentPool(**ManagerInput(fname).content)
         self.results = []
 
-    async def distributed_run(self):
-        async with Scheduler() as sched:
-            async with AsyncExitStack() as stack:
-                ws = [await stack.enter_async_context(Worker(sched.address)) for i in range(self.workers)]
-                async with Client(sched.address, asynchronous=True) as client:
-                    futures = []
-                    for i in range(len(self.pool)):
-                        futures.append(client.submit(self.pool[i].run))
-                    result = await client.gather(futures)
-                    self.save(result)
-                    return result
+    def distributed_run(self):
+        async def f():
+            async with Scheduler() as sched:
+                async with AsyncExitStack() as stack:
+                    ws = []
+                    for i in range(self.workers):
+                        ws.append(await stack.enter_async_context(Worker(sched.address)))
+                    async with Client(sched.address, asynchronous=True) as client:
+                        futures = []
+                        for i in range(len(self.pool)):
+                            futures.append(client.submit(self.pool[i].run))
+                        result = await client.gather(futures)
+                        self.save(result)
+                        return result
+        return asyncio.get_event_loop().run_until_complete(f())
 
     def save(self, results):
         rp = self.pool[0].resultspath
@@ -51,6 +55,4 @@ if __name__ == '__main__':
     import sys
 
     m = Manager(sys.argv[1], int(sys.argv[2]))
-    f = m.distributed_run
-    out = asyncio.get_event_loop().run_until_complete(f())
-    print(out)
+    print(m.distributed_run())

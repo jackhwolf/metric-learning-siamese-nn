@@ -1,5 +1,5 @@
 import numpy as np 
-from itertools import permutations
+from itertools import combinations
 from noise import Noise
 
 class Data:
@@ -20,7 +20,7 @@ class Data:
 
     ''' yield triplets (point_i, point_j, noisy_y_ij) '''
     def iterate_triplets(self):
-        for i, j in permutations(np.arange(self.N), 2):
+        for i, j in combinations(np.arange(self.N), 2):
             point_i, point_j = self.points[i,:], self.points[j,:]
             distance = self.distance_metric(point_i, point_j)
             true_label = np.sign(distance)

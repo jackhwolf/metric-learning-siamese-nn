@@ -44,7 +44,7 @@ class InterpolationExperiment(ExperimentBase):
         self.s = float(s)
         self.u = float(u)
         self.mr = int(r)
-        self.cr = 0
+        self.cr = 1
         self.triplets = []
         self.current_epochs = self.model.epochs
         self.has_interpolated = False
@@ -61,7 +61,7 @@ class InterpolationExperiment(ExperimentBase):
             self.cr += 1
         out = {'timestamp': str(time())}
         out['interpolated'] = self.has_interpolated
-        out['rounds'] = r
+        out['rounds'] = self.cr
         out['record'] = record
         out['final_epochs'] = self.current_epochs
         out['threshold'] = self.loss_threshold
@@ -107,7 +107,6 @@ class ExcessRiskExperiment(ExperimentBase):
 
     def run(self):
         stop = False
-        loss = None
         while not stop:
             for pi, pj, label in self.data.iterate_triplets():
                 loss = self.model.learn_triplet(pi, pj, label['noisy'])
