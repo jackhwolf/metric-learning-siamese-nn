@@ -112,7 +112,7 @@ class ExcessRiskExperiment(ExperimentBase):
                 loss = self.model.learn_triplet(pi, pj, label['noisy'])
                 self.curr_excess_risk = self.relative_excess_risk()
                 self.observed += 1
-                print(f"observed: {self.observed}, c.e.r: {self.curr_excess_risk}")
+                print(f"observed: {self.observed}, loss: {loss}, c.e.r: {self.curr_excess_risk}")
                 if self.curr_excess_risk < self.cer_threshold:
                     stop = True
                     break
