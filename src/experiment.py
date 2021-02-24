@@ -4,6 +4,7 @@ from time import time
 from data import Data
 from model import Model
 
+''' each experiment has a data obj, model obj, and id '''
 class ExperimentBase:
 
     def __init__(self, P, D, N, eid, resultspath, modelargs={}):
@@ -16,11 +17,13 @@ class ExperimentBase:
         pass
 
     def describe(self):
+        ''' return params '''
         out = {}
         out.update(self.model.describe())
         out.update(self.data.describe())
         return out
 
+''' run a pool of N of the same experiments for averaging results '''
 class ExperimentPool:
 
     def __init__(self, poolsize, experiment, experiment_args, model_args):
@@ -36,6 +39,8 @@ class ExperimentPool:
     def __len__(self):
         return self.poolsize
 
+''' experiment to determine if model parameters will 
+interpolate on each triplet of given data '''
 class InterpolationExperiment(ExperimentBase):
 
     def __init__(self, P=10, D=3, N=5, eid=1, loss_threshold=1e-4, s=0.05, u=.2, r=3, modelargs={}):
@@ -97,6 +102,8 @@ class InterpolationExperiment(ExperimentBase):
         out['r'] = self.mr
         return out
 
+''' experiment to determine number of triplets needed for relative excess
+risk between model and user/data truth to be less than 0.1 '''
 class ExcessRiskExperiment(ExperimentBase):
 
     def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, modelargs={}):
@@ -136,8 +143,13 @@ class ExcessRiskExperiment(ExperimentBase):
         rel_excess_risk = abs(risk_hat - risk_star) / risk_star
         return rel_excess_risk
 
+    # ''' compute expectation for prediction '''
+    # def expectation(self, info):
+    #     mu, t, f = info['mu'], info['true'], -1 * info['true']
+    #     return (mu * t) + ((1-mu) * f)
+
     ''' compute expectation for prediction '''
     def expectation(self, info):
-        mu, t, f = info['mu'], info['true'], -1 * info['true']
-        return (mu * t) + ((1-mu) * f)
+        mu = info['mu']  # mu is scaled distance --> probability of label being 1
+        return (mu * 1) + ((1-mu) * -1)
 
