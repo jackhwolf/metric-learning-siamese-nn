@@ -9,9 +9,9 @@ class hingeloss(torch.nn.Module):
         super().__init__()
 
     def forward(self, output, target):
-        hinge_loss = 1 - torch.mul(output, target)
-        hinge_loss[hinge_loss < 0] = 0
-        return hinge_loss
+        hloss = 1 - torch.mul(output, target)
+        hloss[hloss < 0] = 0
+        return hloss
 
 class Model:
 
