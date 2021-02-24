@@ -3,7 +3,7 @@
 
 ## how to run
 - `pip install` dependencies
-- `python3 manager.py path/to/input.yaml`
+- `python3 deploy.py path/to/input.yaml int_num_workers`
 
 ## input files
 - set parameters via yaml files, check samples
