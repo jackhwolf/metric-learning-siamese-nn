@@ -4,17 +4,18 @@ import asyncio
 from dask.distributed import Scheduler, Worker, Client
 from contextlib import AsyncExitStack
 import yaml
-from experiment import ExperimentPool, InterpolationExperiment, ExcessRiskExperiment
+from experiment import ExperimentPool, InterpolationExperiment, PredictionExperiment, ExcessRiskExperiment
+
+emap = {'InterpolationExperiment': InterpolationExperiment,
+        'PredictionExperiment': PredictionExperiment,
+        'ExcessRiskExperiment': ExcessRiskExperiment}
 
 class ManagerInput:
 
     def __init__(self, fname):
         with open(fname) as f:
             self.content = yaml.load(f, Loader=yaml.FullLoader)
-        if self.content['experiment'] == 'InterpolationExperiment':
-            self.content['experiment'] = InterpolationExperiment
-        else:
-            self.content['experiment'] = ExcessRiskExperiment
+        self.content['experiment'] = emap[self.content['experiment']]
         
 class Manager:
 
@@ -35,6 +36,7 @@ class Manager:
                         for i in range(len(self.pool)):
                             futures.append(client.submit(self.pool[i].run))
                         result = await client.gather(futures)
+                        result = self.pool[0].average_results(result)
                         self.save(result)
                         return result
         return asyncio.get_event_loop().run_until_complete(f())
@@ -47,7 +49,10 @@ class Manager:
                 curr = json.loads(fp.read())
         else:
             open(rp, 'a').close()
-        curr.extend(results)
+        if isinstance(results, list):
+            curr.extend(results)
+        else:
+            curr.append(results)
         with open(rp, 'w') as fp:
             fp.write(json.dumps(curr))
 

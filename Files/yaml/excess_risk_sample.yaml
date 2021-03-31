@@ -1,9 +1,9 @@
 poolsize: 20
 experiment: ExcessRiskExperiment
 experiment_args:
-  P: 20
-  D: 3
-  N: 100
+  P: 100
+  D: 1
+  N: 200
   cer_threshold: 0.1
 model_args:
   epochs: 200

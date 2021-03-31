@@ -7,6 +7,6 @@ experiment_args:
   s: 0.05
   u: 0.5
 model_args:
-  epochs: 100
+  epochs: 200
   lr: 1e-2
   wd: 1e-5

@@ -22,8 +22,8 @@ class Data:
     def iterate_triplets(self):
         for i, j in combinations(np.arange(self.N), 2):
             point_i, point_j = self.points[i,:], self.points[j,:]
-            distance = self.distance_metric(point_i, point_j)
-            true_label = np.sign(distance)
+            distance = self.distance_metric(point_i, point_j)  # d(i) - d(j)
+            true_label = np.sign(-1 * distance)                # 1 if d(i) < d(j), else 0
             scaled_distance, noisy_label = Noise(distance)
             label_info = {
                 'distance': distance,
@@ -37,7 +37,7 @@ class Data:
     def distance_metric(self, point_i, point_j):
         dist_i = self.distance_metric_single(point_i)
         dist_j = self.distance_metric_single(point_j)
-        return dist_j - dist_i
+        return dist_i - dist_j
 
     ''' compute the distance metric for a single point '''
     def distance_metric_single(self, point):

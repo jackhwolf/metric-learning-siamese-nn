@@ -3,6 +3,14 @@ import numpy as np
 from torch.autograd import Variable
 from noise import Noise
 
+class logisticloss(torch.nn.Module):
+
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, output, target):
+        return torch.log(1 + torch.exp(-1*target*output))
+
 class hingeloss(torch.nn.Module):
 
     def __init__(self):
@@ -19,7 +27,7 @@ class Model:
         self.P = int(P)
         self.D = int(D)
         self.lr, self.wd, self.epochs = (float(lr), float(wd), int(epochs))
-        self.criterion = hingeloss()
+        self.criterion = logisticloss()
         self.x_hat = self.to_var((torch.rand((1, self.P))*2) - 1)
         self.l_hat = self.to_var((torch.rand((self.P, self.D))*2) - 1)
         params = [self.x_hat, self.l_hat]
