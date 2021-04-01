@@ -23,11 +23,11 @@ class hingeloss(torch.nn.Module):
 
 class Model:
 
-    def __init__(self, P, D, lr=1e-3, wd=1e-5, epochs=100):
+    def __init__(self, P, D, lr=1e-3, wd=1e-5, epochs=100, criterion='logisticloss'):
         self.P = int(P)
         self.D = int(D)
         self.lr, self.wd, self.epochs = (float(lr), float(wd), int(epochs))
-        self.criterion = logisticloss()
+        self.criterion = logisticloss() if criterion == 'logisticloss' else hingeloss()
         self.x_hat = self.to_var((torch.rand((1, self.P))*2) - 1)
         self.l_hat = self.to_var((torch.rand((self.P, self.D))*2) - 1)
         params = [self.x_hat, self.l_hat]
@@ -86,4 +86,5 @@ class Model:
         out['lr'] = self.lr
         out['wd'] = self.wd
         out['epochs'] = self.epochs
+        out['criterion'] = str(self.criterion)[:-2]
         return out

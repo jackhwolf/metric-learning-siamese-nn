@@ -167,14 +167,12 @@ class PredictionExperiment(ExperimentBase):
 		out['rounds'] = self.cr
 		out['record'] = self.record
 		out['final_epochs'] = self.current_epochs
-		out['threshold'] = self.acc_threshold
 		out['parameters'] = super().describe()
 		out['parameters']['acc_threshold'] = self.acc_threshold
 		out['parameters']['s'] = self.s
 		out['parameters']['u'] = self.u
 		out['parameters']['r'] = self.mr
 		return out
-
 
 ''' experiment to determine number of triplets needed for relative excess
 risk between model and user/data truth to be less than 0.1 '''
@@ -185,7 +183,6 @@ class ExcessRiskExperiment(ExperimentBase):
 		self.cer_threshold = cer_threshold
 		self.observed = 0
 		self.risk_star = self.calc_risk_star()
-		print(self.risk_star)
 		self.risk_hat = None
 
 	def run(self):
