@@ -3,7 +3,7 @@ experiment: ExcessRiskExperiment
 experiment_args:
   P: 100
   D: 1
-  N: 200
+  N: 50
   cer_threshold: 0.1
 model_args:
   epochs: 200

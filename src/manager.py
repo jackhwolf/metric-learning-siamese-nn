@@ -4,7 +4,10 @@ import asyncio
 from dask.distributed import Scheduler, Worker, Client
 from contextlib import AsyncExitStack
 import yaml
-from experiment import ExperimentPool, InterpolationExperiment, PredictionExperiment, ExcessRiskExperiment
+from experiments.base import ExperimentPool
+from experiments.interpolation import InterpolationExperiment
+from experiments.prediction import PredictionExperiment
+from experiments.excess_risk import ExcessRiskExperiment
 
 emap = {'InterpolationExperiment': InterpolationExperiment,
         'PredictionExperiment': PredictionExperiment,
