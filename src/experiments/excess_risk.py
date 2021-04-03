@@ -17,7 +17,7 @@ class ExcessRiskExperiment(ExperimentBase):
 
 	def run(self):
 		count = self.learn_initial()
-		self.observed += count
+		self.observed = 0
 		stop = False
 		while not stop:
 			for pi, pj, label in self.data.iterate_triplets():
@@ -81,8 +81,9 @@ class ExcessRiskExperiment(ExperimentBase):
 		return exp[0].detach().numpy().item()
 	
 	def average_results(self, pool_res):
-		obs = np.array([res['observed'] for res in pool_res])
-		obs = np.mean(obs)
 		res = pool_res[0].copy()
-		res['observed'] = obs
+		for key in ['observed', 'initial_sample_count']:
+			obs = np.array([r[key] for r in pool_res])
+			obs = np.mean(obs)
+			res[key] = obs
 		return res
