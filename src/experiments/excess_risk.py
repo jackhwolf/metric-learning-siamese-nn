@@ -7,7 +7,7 @@ from experiments.base import ExperimentBase
 risk between model and user/data truth to be less than 0.1 '''
 class ExcessRiskExperiment(ExperimentBase):
 
-	def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, initial_sample=0.01, modelargs={}):
+	def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, initial_sample=0.0025, modelargs={}):
 		super().__init__(P, D, N, eid, 'excess_risk', modelargs)
 		self.cer_threshold = cer_threshold
 		self.initial_sample = float(initial_sample)
@@ -49,7 +49,7 @@ class ExcessRiskExperiment(ExperimentBase):
 	def relative_excess_risk(self):
 		self.risk_hat = self.calc_risk_hat()
 		rs, rh = self.risk_star[0], self.risk_hat[0]
-		return (rh - rs) / rs
+		return (-1*(rh - rs)) / rs
 
 	def calc_risk_hat(self):
 		rh = 0
