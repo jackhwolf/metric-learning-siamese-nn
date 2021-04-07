@@ -50,13 +50,13 @@ class Model:
     def predict_triplet(self, point_i, point_j):
         pred = None
         with torch.no_grad():
-            pred = self.forward(point_i, point_j)
-        pred = pred.detach().numpy().item()
-        scaled_pred, noisy_pred = Noise(pred)
+            dist = self.forward(point_i, point_j)
+        dist = dist.detach().numpy().item()
+        mu_pred, true_pred, noisy_pred = Noise(dist)
         prediction_info = {
-            'distance': pred,
-            'mu': scaled_pred,
-            'true': np.sign(pred),
+            'distance': dist,
+            'mu': mu_pred,
+            'true': true_pred,
             'noisy': noisy_pred
         }
         return prediction_info
@@ -65,7 +65,7 @@ class Model:
         point_i, point_j = self.to_var(point_i), self.to_var(point_j)
         dist_i = self.forward_one(point_i)
         dist_j = self.forward_one(point_j)
-        distance = (dist_j - dist_i).reshape(-1)
+        distance = (dist_i - dist_j).reshape(-1)
         return distance
 
     def forward_one(self, point):

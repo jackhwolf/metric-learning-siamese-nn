@@ -23,11 +23,10 @@ class Data:
         for i, j in combinations(np.arange(self.N), 2):
             point_i, point_j = self.points[i,:], self.points[j,:]
             distance = self.distance_metric(point_i, point_j)  # d(i) - d(j)
-            true_label = np.sign(-1 * distance)                # 1 if d(i) < d(j), else 0
-            scaled_distance, noisy_label = Noise(distance)
+            mu, true_label, noisy_label = Noise(distance)
             label_info = {
                 'distance': distance,
-                'mu': scaled_distance,
+                'mu': mu,
                 'true': true_label,
                 'noisy': noisy_label
             }
