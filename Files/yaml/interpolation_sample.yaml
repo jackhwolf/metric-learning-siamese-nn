@@ -8,6 +8,6 @@ experiment_args:
   u: 0.5
   r: 10
 model_args:
-  epochs: 200
+  epochs: 100
   lr: 1e-2
   wd: 1e-5
