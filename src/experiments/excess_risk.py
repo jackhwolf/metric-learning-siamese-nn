@@ -7,7 +7,7 @@ from experiments.base import ExperimentBase
 risk between model and user/data truth to be less than 0.1 '''
 class ExcessRiskExperiment(ExperimentBase):
 
-	def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, initial_sample=0.0025, modelargs={}):
+	def __init__(self, P=10, D=3, N=5, eid=1, cer_threshold=0.1, initial_sample=0, modelargs={}):
 		super().__init__(P, D, N, eid, 'excess_risk', modelargs)
 		self.cer_threshold = cer_threshold
 		self.initial_sample = float(initial_sample)
@@ -36,6 +36,8 @@ class ExcessRiskExperiment(ExperimentBase):
 		return out
 
 	def learn_initial(self):
+		if self.initial_sample == 0:
+			return 0
 		count = 0
 		for pi, pj, label in self.data.iterate_triplets():
 			if np.random.rand() > self.initial_sample:
