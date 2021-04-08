@@ -3,7 +3,7 @@ experiment: ExcessRiskExperiment
 experiment_args:
   P: 100
   D: 10
-  N: 100
+  N: 50
   cer_threshold: 0.1
   initial_sample: 0.9
 model_args:
