@@ -48,7 +48,6 @@ class Model:
         return loss.item()
 
     def predict_triplet(self, point_i, point_j):
-        pred = None
         with torch.no_grad():
             dist = self.forward(point_i, point_j)
         dist = dist.detach().numpy().item()

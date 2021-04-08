@@ -11,6 +11,7 @@ class Data:
     '''
     def __init__(self, P, D, N):
         self.P, self.D, self.N  = int(P), int(D), int(N)
+        self.n_triplets = int(np.math.factorial(self.N) / (np.math.factorial(self.N-2) * np.math.factorial(2)))
         self.points = np.random.normal(0, 1/self.P, (self.N+1,self.P))
         xsi = np.random.choice(np.arange(self.N))
         self.x_star = self.points[xsi,:]

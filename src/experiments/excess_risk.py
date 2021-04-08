@@ -44,7 +44,7 @@ class ExcessRiskExperiment(ExperimentBase):
 				continue
 			closs = self.model.learn_triplet(pi, pj, label['noisy'])
 			count += 1
-			print(f"eid: {self.eid}, learned: {count}, loss: {closs}")
+			print(f"eid: {self.eid}, learned: {count}/{self.initial_sample*self.data.n_triplets}, loss: {closs}")
 		return count
 
 	''' compute relative excess risk (R(*) - R(^)) / R(^) '''
