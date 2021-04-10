@@ -1,4 +1,5 @@
 import numpy as np 
+from scipy.linalg import orth
 from itertools import combinations
 from noise import Noise
 
@@ -49,8 +50,9 @@ class Data:
     def random_l_star(self):
         n, m = self.P, self.D
         H = np.random.rand(n, m)
-        u, s, vh = np.linalg.svd(H, full_matrices=False)
-        mat = u @ vh  # mat.T @ mat = identity
+        # u, s, vh = np.linalg.svd(H, full_matrices=False)
+        # mat = u @ vh  # mat.T @ mat = identity
+        mat = orth(H)
         return mat
 
     def describe(self):
@@ -59,3 +61,7 @@ class Data:
         out['D'] = self.D
         out['N'] = self.N
         return out
+
+if __name__ == '__main__':
+    d = Data(3, 2, 50)
+    print(d.l_star)
