@@ -51,7 +51,7 @@ class ExcessRiskExperiment(ExperimentBase):
 	def relative_excess_risk(self):
 		self.risk_hat = self.calc_risk_hat()
 		rs, rh = self.risk_star[0], self.risk_hat[0]
-		return (rs-rh) / rs
+		return (rh-rs) / rs
 
 	def calc_risk_hat(self):
 		rh = 0
